@@ -2,6 +2,12 @@ const tagRegex = /<[a-z]{1,}.*?>.*<\/[a-z]{1,}.*?>/;
 const tagRegexWithNL = /\n?.+<[a-z]{1,}.*?>.*<\/[a-z]{1,}.*?>\n/g;
 
 const React = (() => {
+  const stringToHTMLElement = (parent, string) => {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = string;
+    parent.innerHTML = wrapper.querySelector("*").innerHTML;
+    return parent;
+  };
   const render = (Component, Child, params) => {
     let { jsx, component, method } = Component({
       child: Child ? Child : "",
@@ -22,8 +28,7 @@ const React = (() => {
       }
     }
     if (!component) {
-      let dom = new DOMParser().parseFromString(jsx, "text/xml");
-      return dom;
+      return stringToHTMLElement(parent, jsx);
     }
 
     for (let child of jsx.matchAll(/<(\S*?)[^>]*>.*?<\/\1>|<.*?\/>/g)) {
